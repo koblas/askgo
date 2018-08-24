@@ -13,6 +13,10 @@ github.com/koblas/askgo v0.0.0-20180824141155-72835f0bc102 h1:FQkMxjJuZSsXTwy8Vg
 github.com/koblas/askgo v0.0.0-20180824141155-72835f0bc102/go.mod h1:yUMw8bAV/PqZRSzYJ5CQ2ByWHlIscWx0sHmxTmgEQT4=
 github.com/koblas/askgo v0.0.0-20180824142137-d42ebd8678ba h1:j1sLyRwljOuONUbd+FXVtTvyWnd/lxBbn3y5vVDOE9k=
 github.com/koblas/askgo v0.0.0-20180824142137-d42ebd8678ba/go.mod h1:yUMw8bAV/PqZRSzYJ5CQ2ByWHlIscWx0sHmxTmgEQT4=
+github.com/koblas/askgo v0.0.0-20180824184046-4d40c0ff9a95 h1:coM+Q793ZV4Lq1cFLvyfhDjd3nfbZkEy96ezBYcxkXg=
+github.com/koblas/askgo v0.0.0-20180824184046-4d40c0ff9a95/go.mod h1:yUMw8bAV/PqZRSzYJ5CQ2ByWHlIscWx0sHmxTmgEQT4=
+github.com/koblas/askgo v0.0.0-20180824184147-975f6bf49ba2 h1:ZRLwfDEgxQdx+BJ3rTAwrWvxOmo7w8N7ESfutAMDvSU=
+github.com/koblas/askgo v0.0.0-20180824184147-975f6bf49ba2/go.mod h1:yUMw8bAV/PqZRSzYJ5CQ2ByWHlIscWx0sHmxTmgEQT4=
 github.com/mitchellh/mapstructure v0.0.0-20180715050151-f15292f7a699 h1:KXZJFdun9knAVAR8tg/aHJEr5DgtcbqyvzacK+CDCaI=
 github.com/mitchellh/mapstructure v0.0.0-20180715050151-f15292f7a699/go.mod h1:FVVH3fgwuzCH5S8UJGiWEs2h04kUh9fWfEaFds41c1Y=
 github.com/mitchellh/mapstructure v1.0.0 h1:vVpGvMXJPqSDh2VYHF7gsfQj8Ncx+Xw5Y1KHeTRY+7I=

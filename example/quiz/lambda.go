@@ -29,6 +29,6 @@ func main() {
 	}
 
 	lambda.Start(func(ctx context.Context, envelope *askgo.RequestEnvelope) (interface{}, error) {
-		return skill.ProcessRequest(&askgo.DefaultHandler{Envelope: envelope})
+		return skill.ProcessRequest(askgo.NewDefaultHandler(ctx, envelope))
 	})
 }
