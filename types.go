@@ -1,35 +1,5 @@
+// Alexa Request and response types
 package askgo
-
-import (
-	"errors"
-)
-
-// ErrRequestEnvelopeNil reports that the request envelope was nil
-// there might be edge case which causes panic if for whatever reason this object is empty
-var ErrRequestEnvelopeNil = errors.New("request envelope was nil")
-
-// Skill Alexa defines the primary interface to use to create an Alexa request handler.
-type Skill struct {
-	// ApplicationID must match the ApplicationID defined in the Alexa Skills, if it is the empty string it is ignored.
-	ApplicationID string
-	// IgnoreTimestamp should be used during debugging to test with hard-coded requests
-	IgnoreTimestamp bool
-
-	RequestInterceptors  []RequestInterceptor
-	Handlers             []RequestHandler
-	ResponseInterceptors []ResponseInterceptor
-	ErrorHandlers        []ErrorHandler
-}
-
-// RequestInterceptor interface
-type RequestInterceptor interface {
-	Process(input HandlerInput) error
-}
-
-// ResponseInterceptor interface
-type ResponseInterceptor interface {
-	Process(input HandlerInput, response *ResponseEnvelope) error
-}
 
 // RequestEnvelope contains the data passed from Alexa to the request handler.
 type RequestEnvelope struct {
@@ -135,11 +105,12 @@ type OutputSpeech struct {
 
 // Card contains the data displayed to the user by the Alexa app.
 type Card struct {
-	Type    string `json:"type"`
-	Title   string `json:"title,omitempty"`
-	Content string `json:"content,omitempty"`
-	Text    string `json:"text,omitempty"`
-	Image   *Image `json:"image,omitempty"`
+	Type        string   `json:"type"`
+	Title       string   `json:"title,omitempty"`
+	Content     string   `json:"content,omitempty"`
+	Text        string   `json:"text,omitempty"`
+	Image       *Image   `json:"image,omitempty"`
+	Permissions []string `json:"permissions,omitempty"`
 }
 
 // Image provides URL(s) to the image to display in resposne to the request.
@@ -155,21 +126,31 @@ type Reprompt struct {
 
 // AudioPlayerDirective contains device level instructions on how to handle the response.
 type AudioPlayerDirective struct {
-	Type         string     `json:"type"`
-	PlayBehavior string     `json:"playBehavior,omitempty"`
-	AudioItem    *AudioItem `json:"audioItem,omitempty"`
+	Type          string     `json:"type"`
+	PlayBehavior  string     `json:"playBehavior,omitempty"`
+	AudioItem     *AudioItem `json:"audioItem,omitempty"`
+	ClearBehavior string     `json:"clearBehavior,omitempty"`
 }
 
 // AudioItem contains an audio Stream definition for playback.
 type AudioItem struct {
-	Stream Stream `json:"stream,omitempty"`
+	Stream            Stream             `json:"stream,omitempty"`
+	AudioItemMetadata *AudioItemMetadata `json:"audioItemMetadata,omitempty"`
+}
+
+type AudioItemMetadata struct {
+	Title    string `json:"title,omitempty`
+	Subtitle string `json:"subtitle,omitempty`
+	// Art             string `json:"art,omitempty`
+	// BackgroundImage string `json:"backgroundImage,omitempty`
 }
 
 // Stream contains instructions on playing an audio stream.
 type Stream struct {
-	Token                string `json:"token"`
-	URL                  string `json:"url"`
-	OffsetInMilliseconds int    `json:"offsetInMilliseconds"`
+	Token                 string `json:"token"`
+	URL                   string `json:"url"`
+	OffsetInMilliseconds  int    `json:"offsetInMilliseconds"`
+	ExpectedPreviousToken string `json:"expectedPreviousToken,omitempty"`
 }
 
 // DialogDirective contains directives for use in Dialog prompts.
@@ -178,4 +159,34 @@ type DialogDirective struct {
 	SlotToElicit  string  `json:"slotToElicit,omitempty"`
 	SlotToConfirm string  `json:"slotToConfirm,omitempty"`
 	UpdatedIntent *Intent `json:"updatedIntent,omitempty"`
+}
+
+type RenderTemplateDirective struct {
+	Type     string `json:"type"`
+	Template string `json:"template,omitempty"`
+}
+
+type PlainTextHint struct {
+	Type string `json:"type"`
+	Text string `json:"template,omitempty"`
+}
+
+type HintDirective struct {
+	Type string        `json:"type"`
+	Hint PlainTextHint `json:"hint,omitempty"`
+}
+
+type VideoItemMetadata struct {
+	Title    string `json:"title,omitempty"`
+	Subtitle string `json:"subtitle,omitempty"`
+}
+
+type VideoItem struct {
+	Source   string             `json:"source"`
+	Metadata *VideoItemMetadata `json:"metadata,omitempty"`
+}
+
+type LaunchDirective struct {
+	Type      string    `json:"type"`
+	VideoItem VideoItem `json:"videoItem,omitempty"`
 }

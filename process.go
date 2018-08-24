@@ -1,6 +1,7 @@
 package askgo
 
 import (
+	"context"
 	"errors"
 	"log"
 	"math"
@@ -10,30 +11,93 @@ import (
 
 var timestampTolerance = 150
 
-// HandlerInput is the standard type for input
+// Skill Alexa defines the primary interface to use to create an Alexa request handler.
+type Skill struct {
+	// ApplicationID must match the ApplicationID defined in the Alexa Skills,
+	// if it is the empty string it is ignored.
+	ApplicationID string
+	// IgnoreTimestamp should be used during debugging to test with hard-coded requests
+	IgnoreTimestamp bool
+
+	// Request interceptors are invoked immediately prior to execution of the request handler
+	// for an incoming request. Request attributes provide a way for request interceptors to
+	// pass data and entities on to request handlers.
+	RequestInterceptors []RequestInterceptor
+
+	// Request handlers are responsible for handling one or more types of incoming requests.
+	Handlers []RequestHandler
+
+	// Response interceptors are invoked immediately after execution of the request handler.
+	// Because response interceptors have access to the output generated from execution of the
+	// request handler, they are ideal for tasks such as response sanitization and validation.
+	ResponseInterceptors []ResponseInterceptor
+
+	// ErrorHandlers are similar to request handlers, but
+	// are instead responsible for handling one or more types of errors.
+	// They are invoked by the SDK when an error is returned during the
+	// course of request processing.
+	ErrorHandlers []ErrorHandler
+}
+
+// HandlerInput is the standard type for input for request handlers,
+// request and response interceptors, and exception handlers are all passed
+// a HandlerInput instance when invoked. This class exposes various entities useful in
+// request processing
 type HandlerInput interface {
 	// GetRequestEnvelope get the full Alexa Request Envelope
 	GetRequestEnvelope() RequestEnvelope
+
 	// GetRequest is a shortcut to GetRequestEnvelope().Request
 	GetRequest() *Request
+
 	// Get the response structure
 	GetResponse() *ResponseEnvelope
-	/*
-		Context? : any;
-		AttributesManager : AttributesManager;
-		ServiceClientFactory? : ServiceClientFactory;
-	*/
+
+	// Provides the context object passed in by the host container. For example, for skills
+	// running on AWS Lambda, this is the context object for the AWS Lambda function.
+	GetContent() context.Context
 }
 
-// RequestHandler interface
+// RequestInterceptor are invoked immediately prior to execution of the request handler
+// for an incoming request. Request attributes provide a way for request interceptors to
+// pass data and entities on to request handlers.
+type RequestInterceptor interface {
+	Process(input HandlerInput) error
+}
+
+// ResponseInterceptor are called after the main request handler has been triggered
+// these can make any further updates or inspections of the response (e.g. logging)
+type ResponseInterceptor interface {
+	Process(input HandlerInput, response *ResponseEnvelope) error
+}
+
+// RequestHandler are responsible for handling one or more types of incoming requests.
 type RequestHandler interface {
+	// CanHandle, which is called by the SDK to determine if the given handler is capable of
+	// processing the incoming request. This method returns **true** if the handler can handle the
+	// request, or **false** if not. You have the flexibility to choose the conditions on which to
+	// base this determination, including the type or parameters of the incoming request, or
+	// skill attributes.
 	CanHandle(input HandlerInput) bool
+
+	// Handle, which is called by the SDK when invoking the request handler. This method contains
+	// the handler’s request processing logic, and returns an optional Response.
 	Handle(input HandlerInput) (*ResponseEnvelope, error)
 }
 
-// ErrorHandler interface
+// ErrorHandler handlers are similar to request handlers, but
+// are instead responsible for handling one or more types of errors.
+// They are invoked by the SDK when an error is returned during the
+// course of request processing.
 type ErrorHandler interface {
+	// CanHandle, which is called by the SDK to determine if the given handler is capable of
+	// handling the error. This method returns **true** if the handler can handle the exception,
+	// or **false** if not. A catch-all handler can be easily introduced by simply returning **true**
+	// in all cases.
 	CanHandle(input HandlerInput, e error) bool
+	// Handle, which is called by the SDK when invoking the error handler. This
+	// method contains all exception handling logic, and returns an output which
+	// optionally may contain a Response.
 	Handle(input HandlerInput, e error) (*ResponseEnvelope, error)
 }
 
@@ -130,24 +194,35 @@ func (skill *Skill) verifyTimestamp(envelope RequestEnvelope) error {
 
 // DefaultHandler for request processing
 type DefaultHandler struct {
-	Envelope *RequestEnvelope
-	Response *ResponseEnvelope
+	envelope *RequestEnvelope
+	response *ResponseEnvelope
+	context  context.Context
+}
+
+// NewDefaultHandler builds a structure that supports the default HandlerInput methods
+func NewDefaultHandler(ctx context.Context, envelope *RequestEnvelope) *DefaultHandler {
+	return &DefaultHandler{envelope: envelope, context: ctx}
 }
 
 // GetRequestEnvelope -- get the full envelope from the request
 func (handler *DefaultHandler) GetRequestEnvelope() RequestEnvelope {
-	return *handler.Envelope
+	return *handler.envelope
 }
 
 // GetRequest -- quickly get to the request structure
 func (handler *DefaultHandler) GetRequest() *Request {
-	return handler.Envelope.Request
+	return handler.envelope.Request
 }
 
 // GetResponse -- Get the response structure
 func (handler *DefaultHandler) GetResponse() *ResponseEnvelope {
-	if handler.Response == nil {
-		handler.Response = &ResponseEnvelope{Version: "1.0"}
+	if handler.response == nil {
+		handler.response = &ResponseEnvelope{Version: "1.0"}
 	}
-	return handler.Response
+	return handler.response
+}
+
+// GetContext returns the default context from construction
+func (handler *DefaultHandler) GetContext() context.Context {
+	return handler.context
 }
