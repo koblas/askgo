@@ -10,10 +10,10 @@ var ErrRequestEnvelopeNil = errors.New("request envelope was nil")
 
 // Skill Alexa defines the primary interface to use to create an Alexa request handler.
 type Skill struct {
-	ApplicationID       string
-	RequestHandler      RequestHandler
-	IgnoreApplicationID bool
-	IgnoreTimestamp     bool
+	// ApplicationID must match the ApplicationID defined in the Alexa Skills, if it is the empty string it is ignored.
+	ApplicationID string
+	// IgnoreTimestamp should be used during debugging to test with hard-coded requests
+	IgnoreTimestamp bool
 
 	RequestInterceptors  []RequestInterceptor
 	Handlers             []RequestHandler

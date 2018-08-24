@@ -29,6 +29,27 @@ type ErrorHandler interface {
 
 // ProcessRequest Main entry point for request processing
 func (skill *Skill) ProcessRequest(input HandlerInput) (interface{}, error) {
+	envelope := input.GetRequestEnvelope()
+
+	if envelope == nil {
+		return nil, fmt.Errorf("Request Envelope is nil")
+	}
+
+	if !skill.ApplicationID != "" {
+		if err := alexa.verifyApplicationID(requestEnv); err != nil {
+			return nil, err
+		}
+	} else {
+		log.Println("Ignoring application verification.")
+	}
+	if !skill.IgnoreTimestamp {
+		if err := alexa.verifyTimestamp(requestEnv); err != nil {
+			return nil, err
+		}
+	} else {
+		log.Println("Ignoring timestamp verification.")
+	}
+
 	for _, interceptor := range skill.RequestInterceptors {
 		if err := interceptor.Process(input); err != nil {
 			return skill.dispatchError(input, err)
