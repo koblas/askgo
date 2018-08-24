@@ -261,8 +261,3 @@ func getAttributes(input askgo.HandlerInput) *Attributes {
 
 	return attributes
 }
-
-func setAttributes(session *askgo.Session, attributes *Attributes) {
-	log.Printf("SET Attributes = %+v", attributes)
-	session.Attributes = structs.Map(attributes)
-}
