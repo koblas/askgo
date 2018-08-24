@@ -93,7 +93,7 @@ return input.GetResponse().WithShouldEndSession(false).Speak("Shall we play a ga
 
 ## samples
 
-[Quiz Game](https://github.com/koblas/askgo/tree/master/example)
+[Quiz Game](https://github.com/koblas/askgo/tree/master/example/quiz)
 
 ## Limitations
 
