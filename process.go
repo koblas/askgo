@@ -56,6 +56,9 @@ type HandlerInput interface {
 	// Provides the context object passed in by the host container. For example, for skills
 	// running on AWS Lambda, this is the context object for the AWS Lambda function.
 	GetContext() context.Context
+
+	// Update the running context object
+	SetContext()
 }
 
 // RequestInterceptor are invoked immediately prior to execution of the request handler
@@ -225,4 +228,9 @@ func (handler *DefaultHandler) GetResponse() *ResponseEnvelope {
 // GetContext returns the default context from construction
 func (handler *DefaultHandler) GetContext() context.Context {
 	return handler.context
+}
+
+// SetContext returns the default context from construction
+func (handler *DefaultHandler) SetContext(ctx context.Context) {
+	handler.context = ctx
 }
