@@ -58,7 +58,7 @@ type HandlerInput interface {
 	GetContext() context.Context
 
 	// Update the running context object
-	SetContext()
+	SetContext(ctx context.Context)
 }
 
 // RequestInterceptor are invoked immediately prior to execution of the request handler
@@ -201,6 +201,8 @@ type DefaultHandler struct {
 	response *ResponseEnvelope
 	context  context.Context
 }
+
+var _ HandlerInput = &DefaultHandler{}
 
 // NewDefaultHandler builds a structure that supports the default HandlerInput methods
 func NewDefaultHandler(ctx context.Context, envelope *RequestEnvelope) *DefaultHandler {
