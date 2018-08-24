@@ -55,7 +55,7 @@ type HandlerInput interface {
 
 	// Provides the context object passed in by the host container. For example, for skills
 	// running on AWS Lambda, this is the context object for the AWS Lambda function.
-	GetContent() context.Context
+	GetContext() context.Context
 }
 
 // RequestInterceptor are invoked immediately prior to execution of the request handler
