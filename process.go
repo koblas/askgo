@@ -1,5 +1,15 @@
 package askgo
 
+import (
+	"errors"
+	"log"
+	"math"
+	"strconv"
+	"time"
+)
+
+var timestampTolerance = 150
+
 // HandlerInput is the standard type for input
 type HandlerInput interface {
 	// GetRequestEnvelope get the full Alexa Request Envelope
@@ -31,19 +41,15 @@ type ErrorHandler interface {
 func (skill *Skill) ProcessRequest(input HandlerInput) (interface{}, error) {
 	envelope := input.GetRequestEnvelope()
 
-	if envelope == nil {
-		return nil, fmt.Errorf("Request Envelope is nil")
-	}
-
-	if !skill.ApplicationID != "" {
-		if err := alexa.verifyApplicationID(requestEnv); err != nil {
+	if skill.ApplicationID != "" {
+		if err := skill.verifyApplicationID(envelope); err != nil {
 			return nil, err
 		}
 	} else {
 		log.Println("Ignoring application verification.")
 	}
 	if !skill.IgnoreTimestamp {
-		if err := alexa.verifyTimestamp(requestEnv); err != nil {
+		if err := skill.verifyTimestamp(envelope); err != nil {
 			return nil, err
 		}
 	} else {
@@ -86,6 +92,40 @@ func (skill *Skill) dispatchError(input HandlerInput, err error) (interface{}, e
 	}
 
 	return nil, err
+}
+
+// verifyApplicationId verifies that the ApplicationID sent in the request
+// matches the one configured for this skill.
+func (skill *Skill) verifyApplicationID(envelope RequestEnvelope) error {
+	if appID := skill.ApplicationID; appID != "" {
+		requestAppID := envelope.Session.Application.ApplicationID
+		if requestAppID == "" {
+			return errors.New("request Application ID was set to an empty string")
+		}
+		if appID != requestAppID {
+			return errors.New("request Application ID does not match expected ApplicationId")
+		}
+	}
+
+	return nil
+}
+
+// verifyTimestamp compares the request timestamp to the current timestamp
+// and returns an error if they are too far apart.
+func (skill *Skill) verifyTimestamp(envelope RequestEnvelope) error {
+	timestamp, err := time.Parse(time.RFC3339, envelope.Request.Timestamp)
+	if err != nil {
+		return errors.New("Unable to parse request timestamp.  Err: " + err.Error())
+	}
+
+	now := time.Now()
+	delta := now.Sub(timestamp)
+	deltaSecsAbs := math.Abs(delta.Seconds())
+	if deltaSecsAbs > float64(timestampTolerance) {
+		return errors.New("Invalid Timestamp. The request timestap " + timestamp.String() + " was off the current time " + now.String() + " by more than " + strconv.FormatInt(int64(timestampTolerance), 10) + " seconds.")
+	}
+
+	return nil
 }
 
 // DefaultHandler for request processing
