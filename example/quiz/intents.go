@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strings"
@@ -10,7 +11,38 @@ import (
 )
 
 //  -----------------------
+var attributeContext struct{}
 
+type unpackAttributes struct{}
+
+func (h *unpackAttributes) Process(input askgo.HandlerInput) error {
+	attributes := getAttributes(input)
+
+	log.Printf("Got Attributes")
+
+	input.SetContext(context.WithValue(input.GetContext(), &attributeContext, attributes))
+
+	return nil
+}
+
+//  -----------------------
+type saveAttributes struct{}
+
+func (h *saveAttributes) Process(input askgo.HandlerInput, envelope *askgo.ResponseEnvelope) error {
+	if !envelope.Response.ShouldSessionEnd {
+		attributes, ok := input.GetContext().Value(&attributeContext).(*Attributes)
+
+		if !ok {
+			log.Printf("Error: Attributes not correct type")
+		} else {
+			envelope.SessionAttributes = structs.Map(attributes)
+		}
+	}
+
+	return nil
+}
+
+//  -----------------------
 type errorHandler struct{}
 
 func (h *errorHandler) CanHandle(input askgo.HandlerInput) bool {
@@ -19,7 +51,7 @@ func (h *errorHandler) CanHandle(input askgo.HandlerInput) bool {
 func (h *errorHandler) Handle(input askgo.HandlerInput) (*askgo.ResponseEnvelope, error) {
 	request := input.GetRequest()
 	builder := input.GetResponse().WithShouldEndSession(false)
-	attributes := getAttributes(input)
+	attributes := input.GetContext().Value(&attributeContext).(*Attributes)
 
 	log.Printf("ErrorHandler requestId=%s, sessionId=%s", request.RequestID, attributes.SessionID)
 
@@ -36,7 +68,7 @@ func (h *helpHandler) CanHandle(input askgo.HandlerInput) bool {
 func (h *helpHandler) Handle(input askgo.HandlerInput) (*askgo.ResponseEnvelope, error) {
 	request := input.GetRequest()
 	builder := input.GetResponse().WithShouldEndSession(false)
-	attributes := getAttributes(input)
+	attributes := input.GetContext().Value(&attributeContext).(*Attributes)
 
 	log.Printf("HelpHandler requestId=%s, sessionId=%s", request.RequestID, attributes.SessionID)
 
@@ -55,7 +87,7 @@ func (h *exitHandler) CanHandle(input askgo.HandlerInput) bool {
 func (h *exitHandler) Handle(input askgo.HandlerInput) (*askgo.ResponseEnvelope, error) {
 	request := input.GetRequest()
 	builder := input.GetResponse().WithShouldEndSession(true)
-	attributes := getAttributes(input)
+	attributes := input.GetContext().Value(&attributeContext).(*Attributes)
 
 	log.Printf("ExitHandler requestId=%s, sessionId=%s", request.RequestID, attributes.SessionID)
 
@@ -70,7 +102,7 @@ func (h *sessionEndHandler) CanHandle(input askgo.HandlerInput) bool {
 }
 func (h *sessionEndHandler) Handle(input askgo.HandlerInput) (*askgo.ResponseEnvelope, error) {
 	request := input.GetRequest()
-	attributes := getAttributes(input)
+	attributes := input.GetContext().Value(&attributeContext).(*Attributes)
 
 	log.Printf("SessionEnd requestId=%s, sessionId=%s", request.RequestID, attributes.SessionID)
 
@@ -86,7 +118,7 @@ func (h *launchHandler) CanHandle(input askgo.HandlerInput) bool {
 func (h *launchHandler) Handle(input askgo.HandlerInput) (*askgo.ResponseEnvelope, error) {
 	request := input.GetRequest()
 	response := input.GetResponse().WithShouldEndSession(false)
-	attributes := getAttributes(input)
+	attributes := input.GetContext().Value(&attributeContext).(*Attributes)
 
 	log.Printf("LaunchRequest requestId=%s, sessionId=%s", request.RequestID, attributes.SessionID)
 
@@ -103,7 +135,7 @@ func (h *repeatHandler) CanHandle(input askgo.HandlerInput) bool {
 func (h *repeatHandler) Handle(input askgo.HandlerInput) (*askgo.ResponseEnvelope, error) {
 	request := input.GetRequest()
 	builder := input.GetResponse().WithShouldEndSession(false)
-	attributes := getAttributes(input)
+	attributes := input.GetContext().Value(&attributeContext).(*Attributes)
 
 	log.Printf("RepeatHandler requestId=%s, sessionId=%s", request.RequestID, attributes.SessionID)
 
@@ -123,7 +155,7 @@ func (h *quizHandler) CanHandle(input askgo.HandlerInput) bool {
 func (h *quizHandler) Handle(input askgo.HandlerInput) (*askgo.ResponseEnvelope, error) {
 	request := input.GetRequest()
 	builder := input.GetResponse().WithShouldEndSession(false)
-	attributes := getAttributes(input)
+	attributes := input.GetContext().Value(&attributeContext).(*Attributes)
 
 	log.Printf("QuizHandler requestId=%s, sessionId=%s", request.RequestID, attributes.SessionID)
 
@@ -147,7 +179,7 @@ type definitionHandler struct{}
 
 func (h *definitionHandler) CanHandle(input askgo.HandlerInput) bool {
 	request := input.GetRequest()
-	attributes := getAttributes(input)
+	attributes := input.GetContext().Value(&attributeContext).(*Attributes)
 
 	return attributes.State != QUIZ && request.Intent.Name == "AnswerIntent"
 }
@@ -155,7 +187,7 @@ func (h *definitionHandler) CanHandle(input askgo.HandlerInput) bool {
 func (h *definitionHandler) Handle(input askgo.HandlerInput) (*askgo.ResponseEnvelope, error) {
 	request := input.GetRequest()
 	response := input.GetResponse().WithShouldEndSession(false)
-	attributes := getAttributes(input)
+	attributes := input.GetContext().Value(&attributeContext).(*Attributes)
 
 	log.Printf("DefinitionHandler requestId=%s, sessionId=%s", request.RequestID, attributes.SessionID)
 
@@ -221,14 +253,14 @@ type quizAnswerHandler struct{}
 
 func (h *quizAnswerHandler) CanHandle(input askgo.HandlerInput) bool {
 	request := input.GetRequest()
-	attributes := getAttributes(input)
+	attributes := input.GetContext().Value(&attributeContext).(*Attributes)
 
 	return attributes.State == QUIZ && request.Intent.Name == "AnswerIntent"
 }
 func (h *quizAnswerHandler) Handle(input askgo.HandlerInput) (*askgo.ResponseEnvelope, error) {
 	request := input.GetRequest()
 	response := input.GetResponse().WithShouldEndSession(false)
-	attributes := getAttributes(input)
+	attributes := input.GetContext().Value(&attributeContext).(*Attributes)
 
 	log.Printf("QuizAnswerHandler requestId=%s, sessionId=%s", request.RequestID, attributes.SessionID)
 

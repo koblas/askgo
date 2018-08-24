@@ -15,6 +15,10 @@ func main() {
 		// Timestamps are not important for this skill, plus aids in debugging
 		IgnoreTimestamp: true,
 
+		RequestInterceptors: []askgo.RequestInterceptor{
+			&unpackAttributes{},
+		},
+
 		// Our handler interface
 		Handlers: []askgo.RequestHandler{
 			&sessionEndHandler{},
@@ -25,6 +29,10 @@ func main() {
 			&quizHandler{},
 			&definitionHandler{},
 			&quizAnswerHandler{},
+		},
+
+		ResponseInterceptors: []askgo.ResponseInterceptor{
+			&saveAttributes{},
 		},
 	}
 
