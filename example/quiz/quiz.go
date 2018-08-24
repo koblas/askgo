@@ -241,9 +241,11 @@ func getSpeechDescription(item QuizItem) string {
 }
 
 ///
+/*
 func supportsDisplay(acontext *askgo.Context) bool {
 	return acontext.System.Device.SupportedInterfaces.Display.TemplateVersion != ""
 }
+*/
 
 func getAttributes(input askgo.HandlerInput) *Attributes {
 	session := input.GetRequestEnvelope().Session

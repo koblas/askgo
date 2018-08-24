@@ -8,6 +8,7 @@ import (
 
 	"github.com/fatih/structs"
 	"github.com/koblas/askgo"
+	"github.com/koblas/askgo/amazon"
 )
 
 //  -----------------------
@@ -63,7 +64,7 @@ type helpHandler struct{}
 
 func (h *helpHandler) CanHandle(input askgo.HandlerInput) bool {
 	request := input.GetRequest()
-	return request.Intent.Name == askgo.AMAZON.HelpIntent
+	return request.Intent.Name == amazon.HelpIntent
 }
 func (h *helpHandler) Handle(input askgo.HandlerInput) (*askgo.ResponseEnvelope, error) {
 	request := input.GetRequest()
@@ -80,9 +81,9 @@ type exitHandler struct{}
 
 func (h *exitHandler) CanHandle(input askgo.HandlerInput) bool {
 	request := input.GetRequest()
-	return request.Intent.Name == askgo.AMAZON.StopIntent ||
-		request.Intent.Name == askgo.AMAZON.PauseIntent ||
-		request.Intent.Name == askgo.AMAZON.CancelIntent
+	return request.Intent.Name == amazon.StopIntent ||
+		request.Intent.Name == amazon.PauseIntent ||
+		request.Intent.Name == amazon.CancelIntent
 }
 func (h *exitHandler) Handle(input askgo.HandlerInput) (*askgo.ResponseEnvelope, error) {
 	request := input.GetRequest()
@@ -130,7 +131,7 @@ type repeatHandler struct{}
 
 func (h *repeatHandler) CanHandle(input askgo.HandlerInput) bool {
 	request := input.GetRequest()
-	return request.Intent.Name == askgo.AMAZON.RepeatIntent
+	return request.Intent.Name == amazon.RepeatIntent
 }
 func (h *repeatHandler) Handle(input askgo.HandlerInput) (*askgo.ResponseEnvelope, error) {
 	request := input.GetRequest()
@@ -150,7 +151,7 @@ type quizHandler struct{}
 func (h *quizHandler) CanHandle(input askgo.HandlerInput) bool {
 	request := input.GetRequest()
 
-	return request.Intent.Name == "QuizIntent" || request.Intent.Name == askgo.AMAZON.StartOverIntent
+	return request.Intent.Name == "QuizIntent" || request.Intent.Name == amazon.StartOverIntent
 }
 func (h *quizHandler) Handle(input askgo.HandlerInput) (*askgo.ResponseEnvelope, error) {
 	request := input.GetRequest()
