@@ -1,5 +1,5 @@
 // Alexa Request and response types
-package askgo
+package amazon
 
 // RequestEnvelope contains the data passed from Alexa to the request handler.
 type RequestEnvelope struct {

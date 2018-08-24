@@ -1,4 +1,4 @@
-package askgo
+package amazon
 
 var (
 	// AMAZON Skill Intents

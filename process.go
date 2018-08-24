@@ -7,7 +7,12 @@ import (
 	"math"
 	"strconv"
 	"time"
+
+	"github.com/koblas/askgo/amazon"
 )
+
+type RequestEnvelope = amazon.RequestEnvelope
+type Request = amazon.Request
 
 var timestampTolerance = 150
 
@@ -222,7 +227,7 @@ func (handler *DefaultHandler) GetRequest() *Request {
 // GetResponse -- Get the response structure
 func (handler *DefaultHandler) GetResponse() *ResponseEnvelope {
 	if handler.response == nil {
-		handler.response = &ResponseEnvelope{Version: "1.0"}
+		handler.response = &ResponseEnvelope{amazon.ResponseEnvelope{Version: "1.0"}}
 	}
 	return handler.response
 }
