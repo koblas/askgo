@@ -1,5 +1,5 @@
 /*
-Package askgo is a pure go Alex Skills Kit developement package.
+Package askgo is a pure go Alexa Skills Kit developement package.
 
 Int most cases clients will quickly build a skill with something like this
 
