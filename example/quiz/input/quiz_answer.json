@@ -1,0 +1,72 @@
+{
+	"version": "1.0",
+	"session": {
+		"new": false,
+		"sessionId": "amzn1.echo-api.session.b5a0691b-0bc3-498c-99d0-de9611b0b674",
+		"application": {
+			"applicationId": "amzn1.ask.skill.9e4d01ef-e6fc-44db-929e-837879b10d9d"
+		},
+		"attributes": {
+			"Counter": 1,
+			"QuizScore": 0,
+			"QuizAnswer": "Baton Rouge",
+			"QuizProperty": "Capital",
+			"QuizItemIndex": 17,
+			"State": 1,
+			"UserID": "",
+			"SessionID": "amzn1.echo-api.session.b5a0691b-0bc3-498c-99d0-de9611b0b674"
+		},
+		"user": {
+			"userId": "amzn1.ask.account.AE7JVGBPQUPR2PNO5ATI2KSAB753NIBBKIAA6ZPI3JO2CEQ243TN7PSDCJRDDHUUNKQ5XOXANZDQDLOZOSLP34XEXHMW5MLKI3MPBWZAOF6XCWAKA2T76R3THXPSNDAVOAPQKDCY6EQHCYSYULUDZFHKS4KXZNP4QKUXAE6MNVNIJLYVQK3WD7NE4BCKWCNMRRVYPQNJEJF4EAY"
+		}
+	},
+	"context": {
+		"System": {
+			"application": {
+				"applicationId": "amzn1.ask.skill.9e4d01ef-e6fc-44db-929e-837879b10d9d"
+			},
+			"user": {
+				"userId": "amzn1.ask.account.AE7JVGBPQUPR2PNO5ATI2KSAB753NIBBKIAA6ZPI3JO2CEQ243TN7PSDCJRDDHUUNKQ5XOXANZDQDLOZOSLP34XEXHMW5MLKI3MPBWZAOF6XCWAKA2T76R3THXPSNDAVOAPQKDCY6EQHCYSYULUDZFHKS4KXZNP4QKUXAE6MNVNIJLYVQK3WD7NE4BCKWCNMRRVYPQNJEJF4EAY"
+			},
+			"device": {
+				"deviceId": "amzn1.ask.device.AGWF4T6IFWTJNHK6VDPI3GF6IL5YHPM6QRRWBDGJUOZPNHOX2ZNMKRQUUIY4GJVNWEP2A7B7JV6H3PZVQGJU3JMWTFZSQSEK535MGW522DHIF3OQG2PLKBZEZWZN7DJFAMXWJ54PLHES53ETYZWKQ26XBD4FH3U7FQA3QUUTI44XMB3ZSD6S6",
+				"supportedInterfaces": {}
+			},
+			"apiEndpoint": "https://api.amazonalexa.com",
+			"apiAccessToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6IjEifQ.eyJhdWQiOiJodHRwczovL2FwaS5hbWF6b25hbGV4YS5jb20iLCJpc3MiOiJBbGV4YVNraWxsS2l0Iiwic3ViIjoiYW16bjEuYXNrLnNraWxsLjllNGQwMWVmLWU2ZmMtNDRkYi05MjllLTgzNzg3OWIxMGQ5ZCIsImV4cCI6MTUzNTE2Mjg0MywiaWF0IjoxNTM1MTU5MjQzLCJuYmYiOjE1MzUxNTkyNDMsInByaXZhdGVDbGFpbXMiOnsiY29uc2VudFRva2VuIjpudWxsLCJkZXZpY2VJZCI6ImFtem4xLmFzay5kZXZpY2UuQUdXRjRUNklGV1RKTkhLNlZEUEkzR0Y2SUw1WUhQTTZRUlJXQkRHSlVPWlBOSE9YMlpOTUtSUVVVSVk0R0pWTldFUDJBN0I3SlY2SDNQWlZRR0pVM0pNV1RGWlNRU0VLNTM1TUdXNTIyREhJRjNPUUcyUExLQlpFWldaTjdESkZBTVhXSjU0UExIRVM1M0VUWVpXS1EyNlhCRDRGSDNVN0ZRQTNRVVVUSTQ0WE1CM1pTRDZTNiIsInVzZXJJZCI6ImFtem4xLmFzay5hY2NvdW50LkFFN0pWR0JQUVVQUjJQTk81QVRJMktTQUI3NTNOSUJCS0lBQTZaUEkzSk8yQ0VRMjQzVE43UFNEQ0pSRERIVVVOS1E1WE9YQU5aRFFETE9aT1NMUDM0WEVYSE1XNU1MS0kzTVBCV1pBT0Y2WENXQUtBMlQ3NlIzVEhYUFNOREFWT0FQUUtEQ1k2RVFIQ1lTWVVMVURaRkhLUzRLWFpOUDRRS1VYQUU2TU5WTklKTFlWUUszV0Q3TkU0QkNLV0NOTVJSVllQUU5KRUpGNEVBWSJ9fQ.TUTsuEA65CoICkArl82jFvkRce23LhW0ZBgSJ01sglXIX9bsMFLqpRNw5wA_ObimoG9f07lPYJiqW9sa573aRrqL3cJyXbQTRCm_QfQcuFkAann5JXV9pLnMPvQi01u9z-719SJMUI0La1_wBrHX_IZrVs7OOcR5w56cW0N031j76uWe-j-oW72VPLfsXgUuUDK0Ra-NELdoDTz1mIeX4RejSFWV06B2yQ5v9cpuD83K7BIbkAhu6l_MNm8wkPqlX-T-wNQEglvtZr3iswJwup7VUHtaj2uiveLemt9G05vM0airjB_rj7qgexiMfcoDxnxuiWyfwj8JYu0I6A5c1w"
+		}
+	},
+	"request": {
+		"type": "IntentRequest",
+		"requestId": "amzn1.echo-api.request.f73fc9b9-a9f3-4a69-9f6c-5de977cbcb37",
+		"timestamp": "2018-08-25T01:07:23Z",
+		"locale": "en-US",
+		"intent": {
+			"name": "AnswerIntent",
+			"confirmationStatus": "NONE",
+			"slots": {
+				"Abbreviation": {
+					"name": "Abbreviation",
+					"confirmationStatus": "NONE"
+				},
+				"StatehoodYear": {
+					"name": "StatehoodYear",
+					"value": "1942",
+					"confirmationStatus": "NONE"
+				},
+				"StatehoodOrder": {
+					"name": "StatehoodOrder",
+					"confirmationStatus": "NONE"
+				},
+				"Capital": {
+					"name": "Capital",
+					"confirmationStatus": "NONE"
+				},
+				"StateName": {
+					"name": "StateName",
+					"confirmationStatus": "NONE"
+				}
+			}
+		}
+	}
+}

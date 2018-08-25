@@ -267,8 +267,12 @@ func (h *quizAnswerHandler) Handle(input askgo.HandlerInput) (*askgo.ResponseEnv
 
 	var isCorrect bool
 
-	if prop, ok := request.Intent.Slots[attributes.QuizProperty]; ok {
-		isCorrect = strings.EqualFold(prop.Value, attributes.QuizAnswer)
+	// Alexa is not good at putting the answer in the matching slot
+	for _, prop := range request.Intent.Slots {
+		if strings.EqualFold(prop.Value, attributes.QuizAnswer) {
+			isCorrect = true
+			break
+		}
 	}
 
 	var cons string
