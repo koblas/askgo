@@ -1,4 +1,4 @@
-package amazon
+package alexa
 
 var (
 	StartOverIntent = "AMAZON.StartOverIntent"

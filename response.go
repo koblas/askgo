@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/koblas/askgo/amazon"
+	"github.com/koblas/askgo/alexa"
 )
 
 type ResponseEnvelope struct {
-	amazon.ResponseEnvelope
+	alexa.ResponseEnvelope
 }
 
 // ResponseBuilder that matches
@@ -19,11 +19,11 @@ type ResponseBuilder interface {
 	WithStandardCard(cardTitle, cardContent string, smallImageURL, largeImageURL *string) *ResponseEnvelope
 	WithLinkAccountCard() *ResponseEnvelope
 	WithAskForPermissionsConsentCard(permissions []string) *ResponseEnvelope
-	AddDelegateDirective(updatedIntent *amazon.Intent) *ResponseEnvelope
-	AddElicitSlotDirective(slotToElicit string, updatedIntent *amazon.Intent) *ResponseEnvelope
-	AddConfirmSlotDirective(slotToConfirm string, updatedIntent *amazon.Intent) *ResponseEnvelope
-	AddConfirmIntentDirective(updatedIntent *amazon.Intent) *ResponseEnvelope
-	AddAudioPlayerPlayDirective(playBehavior, url, token string, offsetInMilliseconds int, expectedPreviousToken *string, audioItemMetadata *amazon.AudioItemMetadata) *ResponseEnvelope
+	AddDelegateDirective(updatedIntent *alexa.Intent) *ResponseEnvelope
+	AddElicitSlotDirective(slotToElicit string, updatedIntent *alexa.Intent) *ResponseEnvelope
+	AddConfirmSlotDirective(slotToConfirm string, updatedIntent *alexa.Intent) *ResponseEnvelope
+	AddConfirmIntentDirective(updatedIntent *alexa.Intent) *ResponseEnvelope
+	AddAudioPlayerPlayDirective(playBehavior, url, token string, offsetInMilliseconds int, expectedPreviousToken *string, audioItemMetadata *alexa.AudioItemMetadata) *ResponseEnvelope
 	AddAudioPlayerStopDirective() *ResponseEnvelope
 	AddAudioPlayerClearQueueDirective(clearBehavior string) *ResponseEnvelope
 	AddRenderTemplateDirective(template string) *ResponseEnvelope
@@ -48,9 +48,9 @@ func trimOutputSpeech(speechOutput string) string {
 	return speech
 }
 
-func (envelope *ResponseEnvelope) getResponse() *amazon.Response {
+func (envelope *ResponseEnvelope) getResponse() *alexa.Response {
 	if envelope.Response == nil {
-		envelope.Response = &amazon.Response{}
+		envelope.Response = &alexa.Response{}
 	}
 	return envelope.Response
 }
@@ -58,7 +58,7 @@ func (envelope *ResponseEnvelope) getResponse() *amazon.Response {
 // Speak - have Alexa say the provided speech to the user
 func (envelope *ResponseEnvelope) Speak(speechOutput string) *ResponseEnvelope {
 	response := envelope.getResponse()
-	response.OutputSpeech = &amazon.OutputSpeech{
+	response.OutputSpeech = &alexa.OutputSpeech{
 		Type: "SSML",
 		SSML: fmt.Sprintf("<speak>%s</speak>", trimOutputSpeech(speechOutput)),
 	}
@@ -70,8 +70,8 @@ func (envelope *ResponseEnvelope) Speak(speechOutput string) *ResponseEnvelope {
 // within 8 seconds then has alexa reprompt with the provided reprompt speech
 func (envelope *ResponseEnvelope) Reprompt(speechOutput string) *ResponseEnvelope {
 	response := envelope.getResponse()
-	response.Reprompt = &amazon.Reprompt{
-		&amazon.OutputSpeech{
+	response.Reprompt = &alexa.Reprompt{
+		&alexa.OutputSpeech{
 			Type: "SSML",
 			SSML: fmt.Sprintf("<speak>%s</speak>", trimOutputSpeech(speechOutput)),
 		},
@@ -84,7 +84,7 @@ func (envelope *ResponseEnvelope) Reprompt(speechOutput string) *ResponseEnvelop
 func (envelope *ResponseEnvelope) WithSimpleCard(cardTitle, cardContent string) *ResponseEnvelope {
 	response := envelope.getResponse()
 
-	response.Card = &amazon.Card{
+	response.Card = &alexa.Card{
 		Type:    "Simple",
 		Title:   cardTitle,
 		Content: cardContent,
@@ -97,14 +97,14 @@ func (envelope *ResponseEnvelope) WithSimpleCard(cardTitle, cardContent string) 
 func (envelope *ResponseEnvelope) WithStandardCard(cardTitle, cardContent string, smallImageUrl, largeImageUrl *string) *ResponseEnvelope {
 	response := envelope.getResponse()
 
-	response.Card = &amazon.Card{
+	response.Card = &alexa.Card{
 		Type:  "Standard",
 		Title: cardTitle,
 		Text:  cardContent,
 	}
 
 	if smallImageUrl != nil || largeImageUrl != nil {
-		response.Card.Image = &amazon.Image{}
+		response.Card.Image = &alexa.Image{}
 		if smallImageUrl != nil {
 			response.Card.Image.SmallImageURL = *smallImageUrl
 		}
@@ -120,7 +120,7 @@ func (envelope *ResponseEnvelope) WithStandardCard(cardTitle, cardContent string
 func (envelope *ResponseEnvelope) WithLinkAccountCard() *ResponseEnvelope {
 	response := envelope.getResponse()
 
-	response.Card = &amazon.Card{
+	response.Card = &alexa.Card{
 		Type: "LinkAccount",
 	}
 
@@ -131,7 +131,7 @@ func (envelope *ResponseEnvelope) WithLinkAccountCard() *ResponseEnvelope {
 func (envelope *ResponseEnvelope) WithAskForPermissionsConsentCard(permissions []string) *ResponseEnvelope {
 	response := envelope.getResponse()
 
-	response.Card = &amazon.Card{
+	response.Card = &alexa.Card{
 		Type:        "AskForPermissionsConsent",
 		Permissions: permissions,
 	}
@@ -139,31 +139,31 @@ func (envelope *ResponseEnvelope) WithAskForPermissionsConsentCard(permissions [
 	return envelope
 }
 
-func (envelope *ResponseEnvelope) AddDelegateDirective(updatedIntent *amazon.Intent) *ResponseEnvelope {
-	return envelope.AddDirective(&amazon.DialogDirective{
+func (envelope *ResponseEnvelope) AddDelegateDirective(updatedIntent *alexa.Intent) *ResponseEnvelope {
+	return envelope.AddDirective(&alexa.DialogDirective{
 		Type:          "Dialog.Delegate",
 		UpdatedIntent: updatedIntent,
 	})
 }
 
-func (envelope *ResponseEnvelope) AddElicitSlotDirective(slotToElicit string, updatedIntent *amazon.Intent) *ResponseEnvelope {
-	return envelope.AddDirective(&amazon.DialogDirective{
+func (envelope *ResponseEnvelope) AddElicitSlotDirective(slotToElicit string, updatedIntent *alexa.Intent) *ResponseEnvelope {
+	return envelope.AddDirective(&alexa.DialogDirective{
 		Type:          "Dialog.ElicitSlot",
 		SlotToElicit:  slotToElicit,
 		UpdatedIntent: updatedIntent,
 	})
 }
 
-func (envelope *ResponseEnvelope) AddConfirmSlotDirective(slotToConfirm string, updatedIntent *amazon.Intent) *ResponseEnvelope {
-	return envelope.AddDirective(&amazon.DialogDirective{
+func (envelope *ResponseEnvelope) AddConfirmSlotDirective(slotToConfirm string, updatedIntent *alexa.Intent) *ResponseEnvelope {
+	return envelope.AddDirective(&alexa.DialogDirective{
 		Type:          "Dialog.ConfirmSlot",
 		SlotToConfirm: slotToConfirm,
 		UpdatedIntent: updatedIntent,
 	})
 }
 
-func (envelope *ResponseEnvelope) AddConfirmIntentDirective(updatedIntent *amazon.Intent) *ResponseEnvelope {
-	return envelope.AddDirective(&amazon.DialogDirective{
+func (envelope *ResponseEnvelope) AddConfirmIntentDirective(updatedIntent *alexa.Intent) *ResponseEnvelope {
+	return envelope.AddDirective(&alexa.DialogDirective{
 		Type:          "Dialog.ConfirmIntent",
 		UpdatedIntent: updatedIntent,
 	})
@@ -175,9 +175,9 @@ func (envelope *ResponseEnvelope) AddAudioPlayerPlayDirective(
 	token string,
 	offsetInMilliseconds int,
 	expectedPreviousToken *string,
-	audioItemMetadata *amazon.AudioItemMetadata) *ResponseEnvelope {
+	audioItemMetadata *alexa.AudioItemMetadata) *ResponseEnvelope {
 
-	stream := amazon.Stream{
+	stream := alexa.Stream{
 		Token:                token,
 		URL:                  url,
 		OffsetInMilliseconds: offsetInMilliseconds,
@@ -187,12 +187,12 @@ func (envelope *ResponseEnvelope) AddAudioPlayerPlayDirective(
 		stream.ExpectedPreviousToken = *expectedPreviousToken
 	}
 
-	audioItem := &amazon.AudioItem{
+	audioItem := &alexa.AudioItem{
 		Stream:            stream,
 		AudioItemMetadata: audioItemMetadata,
 	}
 
-	return envelope.AddDirective(&amazon.AudioPlayerDirective{
+	return envelope.AddDirective(&alexa.AudioPlayerDirective{
 		Type:         "AudioPlayer.Play",
 		PlayBehavior: playBehavior,
 		AudioItem:    audioItem,
@@ -200,29 +200,29 @@ func (envelope *ResponseEnvelope) AddAudioPlayerPlayDirective(
 }
 
 func (envelope *ResponseEnvelope) AddAudioPlayerStopDirective() *ResponseEnvelope {
-	return envelope.AddDirective(&amazon.AudioPlayerDirective{
+	return envelope.AddDirective(&alexa.AudioPlayerDirective{
 		Type: "AudioPlayer.Stop",
 	})
 }
 
 func (envelope *ResponseEnvelope) AddAudioPlayerClearQueueDirective(clearBehavior string) *ResponseEnvelope {
-	return envelope.AddDirective(&amazon.AudioPlayerDirective{
+	return envelope.AddDirective(&alexa.AudioPlayerDirective{
 		Type:          "AudioPlayer.ClearQueue",
 		ClearBehavior: clearBehavior,
 	})
 }
 
 func (envelope *ResponseEnvelope) AddRenderTemplateDirective(template string) *ResponseEnvelope {
-	return envelope.AddDirective(&amazon.RenderTemplateDirective{
+	return envelope.AddDirective(&alexa.RenderTemplateDirective{
 		Type:     "Display.RenderTemplate",
 		Template: template,
 	})
 }
 
 func (envelope *ResponseEnvelope) AddHintDirective(text string) *ResponseEnvelope {
-	return envelope.AddDirective(&amazon.HintDirective{
+	return envelope.AddDirective(&alexa.HintDirective{
 		Type: "Hint",
-		Hint: amazon.PlainTextHint{
+		Hint: alexa.PlainTextHint{
 			Type: "PlainText",
 			Text: text,
 		},
@@ -230,12 +230,12 @@ func (envelope *ResponseEnvelope) AddHintDirective(text string) *ResponseEnvelop
 }
 
 func (envelope *ResponseEnvelope) AddVideoAppLaunchDirective(source string, title, subtitle *string) *ResponseEnvelope {
-	videoItem := amazon.VideoItem{
+	videoItem := alexa.VideoItem{
 		Source: source,
 	}
 
 	if title != nil || subtitle != nil {
-		videoItem.Metadata = &amazon.VideoItemMetadata{}
+		videoItem.Metadata = &alexa.VideoItemMetadata{}
 		if title != nil {
 			videoItem.Metadata.Title = *title
 		}
@@ -246,7 +246,7 @@ func (envelope *ResponseEnvelope) AddVideoAppLaunchDirective(source string, titl
 
 	envelope.Response.ShouldSessionEnd = false
 
-	return envelope.AddDirective(&amazon.LaunchDirective{
+	return envelope.AddDirective(&alexa.LaunchDirective{
 		Type:      "VideoApp.Launch",
 		VideoItem: videoItem,
 	})
@@ -267,7 +267,7 @@ func (envelope *ResponseEnvelope) WithShouldEndSession(val bool) *ResponseEnvelo
 
 	// If we're launch a video session cannot end
 	for _, d := range response.Directives {
-		if launch, ok := d.(amazon.LaunchDirective); ok {
+		if launch, ok := d.(alexa.LaunchDirective); ok {
 			if launch.Type == "VideoApp.Launch" {
 				return envelope
 			}

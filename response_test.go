@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/koblas/askgo"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_Interface(t *testing.T) {
@@ -11,7 +12,5 @@ func Test_Interface(t *testing.T) {
 
 	env.WithShouldEndSession(true)
 
-	if !env.Response.ShouldSessionEnd {
-		t.Error("Expected true")
-	}
+	require.True(t, env.Response.ShouldSessionEnd, "Session End")
 }

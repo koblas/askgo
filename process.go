@@ -8,11 +8,11 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/koblas/askgo/amazon"
+	"github.com/koblas/askgo/alexa"
 )
 
-type RequestEnvelope = amazon.RequestEnvelope
-type Request = amazon.Request
+type RequestEnvelope = alexa.RequestEnvelope
+type Request = alexa.Request
 
 var timestampTolerance = 150
 
@@ -227,7 +227,7 @@ func (handler *DefaultHandler) GetRequest() *Request {
 // GetResponse -- Get the response structure
 func (handler *DefaultHandler) GetResponse() *ResponseEnvelope {
 	if handler.response == nil {
-		handler.response = &ResponseEnvelope{amazon.ResponseEnvelope{Version: "1.0"}}
+		handler.response = &ResponseEnvelope{alexa.ResponseEnvelope{Version: "1.0"}}
 	}
 	return handler.response
 }
