@@ -1,4 +1,4 @@
-// Alexa Request and response types
+// Package alexa is the JSON structure for Alexa Request and response types
 package alexa
 
 // RequestEnvelope contains the data passed from Alexa to the request handler.
@@ -138,9 +138,10 @@ type AudioItem struct {
 	AudioItemMetadata *AudioItemMetadata `json:"audioItemMetadata,omitempty"`
 }
 
+// AudioItemMetadata  -
 type AudioItemMetadata struct {
-	Title    string `json:"title,omitempty`
-	Subtitle string `json:"subtitle,omitempty`
+	Title    string `json:"title,omitempty"`
+	Subtitle string `json:"subtitle,omitempty"`
 	// Art             string `json:"art,omitempty`
 	// BackgroundImage string `json:"backgroundImage,omitempty`
 }
@@ -161,31 +162,37 @@ type DialogDirective struct {
 	UpdatedIntent *Intent `json:"updatedIntent,omitempty"`
 }
 
+// RenderTemplateDirective -
 type RenderTemplateDirective struct {
 	Type     string `json:"type"`
 	Template string `json:"template,omitempty"`
 }
 
+// PlainTextHint -
 type PlainTextHint struct {
 	Type string `json:"type"`
 	Text string `json:"template,omitempty"`
 }
 
+// HintDirective -
 type HintDirective struct {
 	Type string        `json:"type"`
 	Hint PlainTextHint `json:"hint,omitempty"`
 }
 
+// VideoItemMetadata -
 type VideoItemMetadata struct {
 	Title    string `json:"title,omitempty"`
 	Subtitle string `json:"subtitle,omitempty"`
 }
 
+// VideoItem -
 type VideoItem struct {
 	Source   string             `json:"source"`
 	Metadata *VideoItemMetadata `json:"metadata,omitempty"`
 }
 
+// LaunchDirective -
 type LaunchDirective struct {
 	Type      string    `json:"type"`
 	VideoItem VideoItem `json:"videoItem,omitempty"`

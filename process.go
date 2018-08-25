@@ -11,7 +11,10 @@ import (
 	"github.com/koblas/askgo/alexa"
 )
 
+// RequestEnvelope is really alexa.RequestEnvelope
 type RequestEnvelope = alexa.RequestEnvelope
+
+// Request is really alexa.Request
 type Request = alexa.Request
 
 var timestampTolerance = 150

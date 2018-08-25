@@ -7,11 +7,12 @@ import (
 	"github.com/koblas/askgo/alexa"
 )
 
+// ResponseEnvelope wrapper around askgo.alexa type
 type ResponseEnvelope struct {
 	alexa.ResponseEnvelope
 }
 
-// ResponseBuilder that matches
+// ResponseBuilder interface for building requests
 type ResponseBuilder interface {
 	Speak(speechOutput string) *ResponseEnvelope
 	Reprompt(speechOutput string) *ResponseEnvelope
@@ -70,8 +71,9 @@ func (envelope *ResponseEnvelope) Speak(speechOutput string) *ResponseEnvelope {
 // within 8 seconds then has alexa reprompt with the provided reprompt speech
 func (envelope *ResponseEnvelope) Reprompt(speechOutput string) *ResponseEnvelope {
 	response := envelope.getResponse()
+
 	response.Reprompt = &alexa.Reprompt{
-		&alexa.OutputSpeech{
+		OutputSpeech: &alexa.OutputSpeech{
 			Type: "SSML",
 			SSML: fmt.Sprintf("<speak>%s</speak>", trimOutputSpeech(speechOutput)),
 		},
@@ -94,7 +96,7 @@ func (envelope *ResponseEnvelope) WithSimpleCard(cardTitle, cardContent string) 
 }
 
 // WithStandardCard - renders a standard card with the following title, content and image
-func (envelope *ResponseEnvelope) WithStandardCard(cardTitle, cardContent string, smallImageUrl, largeImageUrl *string) *ResponseEnvelope {
+func (envelope *ResponseEnvelope) WithStandardCard(cardTitle, cardContent string, smallImageURL, largeImageURL *string) *ResponseEnvelope {
 	response := envelope.getResponse()
 
 	response.Card = &alexa.Card{
@@ -103,13 +105,13 @@ func (envelope *ResponseEnvelope) WithStandardCard(cardTitle, cardContent string
 		Text:  cardContent,
 	}
 
-	if smallImageUrl != nil || largeImageUrl != nil {
+	if smallImageURL != nil || largeImageURL != nil {
 		response.Card.Image = &alexa.Image{}
-		if smallImageUrl != nil {
-			response.Card.Image.SmallImageURL = *smallImageUrl
+		if smallImageURL != nil {
+			response.Card.Image.SmallImageURL = *smallImageURL
 		}
-		if largeImageUrl != nil {
-			response.Card.Image.LargeImageURL = *largeImageUrl
+		if largeImageURL != nil {
+			response.Card.Image.LargeImageURL = *largeImageURL
 		}
 	}
 
@@ -127,7 +129,7 @@ func (envelope *ResponseEnvelope) WithLinkAccountCard() *ResponseEnvelope {
 	return envelope
 }
 
-// WithAskForPermissionsConcentCard - renders an askForPermissionsConsent card
+// WithAskForPermissionsConsentCard - renders an askForPermissionsConsent card
 func (envelope *ResponseEnvelope) WithAskForPermissionsConsentCard(permissions []string) *ResponseEnvelope {
 	response := envelope.getResponse()
 
@@ -139,6 +141,7 @@ func (envelope *ResponseEnvelope) WithAskForPermissionsConsentCard(permissions [
 	return envelope
 }
 
+// AddDelegateDirective -
 func (envelope *ResponseEnvelope) AddDelegateDirective(updatedIntent *alexa.Intent) *ResponseEnvelope {
 	return envelope.AddDirective(&alexa.DialogDirective{
 		Type:          "Dialog.Delegate",
@@ -146,6 +149,7 @@ func (envelope *ResponseEnvelope) AddDelegateDirective(updatedIntent *alexa.Inte
 	})
 }
 
+// AddElicitSlotDirective -
 func (envelope *ResponseEnvelope) AddElicitSlotDirective(slotToElicit string, updatedIntent *alexa.Intent) *ResponseEnvelope {
 	return envelope.AddDirective(&alexa.DialogDirective{
 		Type:          "Dialog.ElicitSlot",
@@ -154,6 +158,7 @@ func (envelope *ResponseEnvelope) AddElicitSlotDirective(slotToElicit string, up
 	})
 }
 
+// AddConfirmSlotDirective -
 func (envelope *ResponseEnvelope) AddConfirmSlotDirective(slotToConfirm string, updatedIntent *alexa.Intent) *ResponseEnvelope {
 	return envelope.AddDirective(&alexa.DialogDirective{
 		Type:          "Dialog.ConfirmSlot",
@@ -162,6 +167,7 @@ func (envelope *ResponseEnvelope) AddConfirmSlotDirective(slotToConfirm string, 
 	})
 }
 
+// AddConfirmIntentDirective -
 func (envelope *ResponseEnvelope) AddConfirmIntentDirective(updatedIntent *alexa.Intent) *ResponseEnvelope {
 	return envelope.AddDirective(&alexa.DialogDirective{
 		Type:          "Dialog.ConfirmIntent",
@@ -169,6 +175,7 @@ func (envelope *ResponseEnvelope) AddConfirmIntentDirective(updatedIntent *alexa
 	})
 }
 
+// AddAudioPlayerPlayDirective -
 func (envelope *ResponseEnvelope) AddAudioPlayerPlayDirective(
 	playBehavior string,
 	url string,
@@ -199,12 +206,14 @@ func (envelope *ResponseEnvelope) AddAudioPlayerPlayDirective(
 	})
 }
 
+// AddAudioPlayerStopDirective -
 func (envelope *ResponseEnvelope) AddAudioPlayerStopDirective() *ResponseEnvelope {
 	return envelope.AddDirective(&alexa.AudioPlayerDirective{
 		Type: "AudioPlayer.Stop",
 	})
 }
 
+// AddAudioPlayerClearQueueDirective -
 func (envelope *ResponseEnvelope) AddAudioPlayerClearQueueDirective(clearBehavior string) *ResponseEnvelope {
 	return envelope.AddDirective(&alexa.AudioPlayerDirective{
 		Type:          "AudioPlayer.ClearQueue",
@@ -212,6 +221,7 @@ func (envelope *ResponseEnvelope) AddAudioPlayerClearQueueDirective(clearBehavio
 	})
 }
 
+// AddRenderTemplateDirective -
 func (envelope *ResponseEnvelope) AddRenderTemplateDirective(template string) *ResponseEnvelope {
 	return envelope.AddDirective(&alexa.RenderTemplateDirective{
 		Type:     "Display.RenderTemplate",
@@ -219,6 +229,7 @@ func (envelope *ResponseEnvelope) AddRenderTemplateDirective(template string) *R
 	})
 }
 
+// AddHintDirective -
 func (envelope *ResponseEnvelope) AddHintDirective(text string) *ResponseEnvelope {
 	return envelope.AddDirective(&alexa.HintDirective{
 		Type: "Hint",
@@ -229,6 +240,7 @@ func (envelope *ResponseEnvelope) AddHintDirective(text string) *ResponseEnvelop
 	})
 }
 
+// AddVideoAppLaunchDirective -
 func (envelope *ResponseEnvelope) AddVideoAppLaunchDirective(source string, title, subtitle *string) *ResponseEnvelope {
 	videoItem := alexa.VideoItem{
 		Source: source,
