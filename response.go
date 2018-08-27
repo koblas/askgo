@@ -27,7 +27,7 @@ type ResponseBuilder interface {
 	AddAudioPlayerPlayDirective(playBehavior, url, token string, offsetInMilliseconds int, expectedPreviousToken *string, audioItemMetadata *alexa.AudioItemMetadata) *ResponseEnvelope
 	AddAudioPlayerStopDirective() *ResponseEnvelope
 	AddAudioPlayerClearQueueDirective(clearBehavior string) *ResponseEnvelope
-	AddRenderTemplateDirective(template string) *ResponseEnvelope
+	AddRenderTemplateDirective(template alexa.DisplayTemplate) *ResponseEnvelope
 	AddHintDirective(text string) *ResponseEnvelope
 	AddVideoAppLaunchDirective(source string, title, subtitle *string) *ResponseEnvelope
 	WithShouldEndSession(val bool) *ResponseEnvelope
@@ -143,7 +143,7 @@ func (envelope *ResponseEnvelope) WithAskForPermissionsConsentCard(permissions [
 
 // AddDelegateDirective -
 func (envelope *ResponseEnvelope) AddDelegateDirective(updatedIntent *alexa.Intent) *ResponseEnvelope {
-	return envelope.AddDirective(&alexa.DialogDirective{
+	return envelope.AddDirective(&alexa.DialogDelegateDirective{
 		Type:          "Dialog.Delegate",
 		UpdatedIntent: updatedIntent,
 	})
@@ -151,25 +151,25 @@ func (envelope *ResponseEnvelope) AddDelegateDirective(updatedIntent *alexa.Inte
 
 // AddElicitSlotDirective -
 func (envelope *ResponseEnvelope) AddElicitSlotDirective(slotToElicit string, updatedIntent *alexa.Intent) *ResponseEnvelope {
-	return envelope.AddDirective(&alexa.DialogDirective{
+	return envelope.AddDirective(&alexa.DialogElicitDirective{
 		Type:          "Dialog.ElicitSlot",
-		SlotToElicit:  slotToElicit,
 		UpdatedIntent: updatedIntent,
+		SlotToElicit:  slotToElicit,
 	})
 }
 
 // AddConfirmSlotDirective -
 func (envelope *ResponseEnvelope) AddConfirmSlotDirective(slotToConfirm string, updatedIntent *alexa.Intent) *ResponseEnvelope {
-	return envelope.AddDirective(&alexa.DialogDirective{
+	return envelope.AddDirective(&alexa.DialogConfirmSlotDirective{
 		Type:          "Dialog.ConfirmSlot",
-		SlotToConfirm: slotToConfirm,
 		UpdatedIntent: updatedIntent,
+		SlotToConfirm: slotToConfirm,
 	})
 }
 
 // AddConfirmIntentDirective -
 func (envelope *ResponseEnvelope) AddConfirmIntentDirective(updatedIntent *alexa.Intent) *ResponseEnvelope {
-	return envelope.AddDirective(&alexa.DialogDirective{
+	return envelope.AddDirective(&alexa.DialogConfirmIntentDirective{
 		Type:          "Dialog.ConfirmIntent",
 		UpdatedIntent: updatedIntent,
 	})
@@ -184,7 +184,7 @@ func (envelope *ResponseEnvelope) AddAudioPlayerPlayDirective(
 	expectedPreviousToken *string,
 	audioItemMetadata *alexa.AudioItemMetadata) *ResponseEnvelope {
 
-	stream := alexa.Stream{
+	stream := alexa.AudioStream{
 		Token:                token,
 		URL:                  url,
 		OffsetInMilliseconds: offsetInMilliseconds,
@@ -194,36 +194,34 @@ func (envelope *ResponseEnvelope) AddAudioPlayerPlayDirective(
 		stream.ExpectedPreviousToken = *expectedPreviousToken
 	}
 
-	audioItem := &alexa.AudioItem{
-		Stream:            stream,
-		AudioItemMetadata: audioItemMetadata,
-	}
-
-	return envelope.AddDirective(&alexa.AudioPlayerDirective{
+	return envelope.AddDirective(&alexa.AudioPlayerPlayDirective{
 		Type:         "AudioPlayer.Play",
 		PlayBehavior: playBehavior,
-		AudioItem:    audioItem,
+		AudioItem: alexa.AudioItem{
+			Stream:   stream,
+			Metadata: audioItemMetadata,
+		},
 	})
 }
 
 // AddAudioPlayerStopDirective -
 func (envelope *ResponseEnvelope) AddAudioPlayerStopDirective() *ResponseEnvelope {
-	return envelope.AddDirective(&alexa.AudioPlayerDirective{
+	return envelope.AddDirective(&alexa.AudioPlayerStopDirective{
 		Type: "AudioPlayer.Stop",
 	})
 }
 
 // AddAudioPlayerClearQueueDirective -
 func (envelope *ResponseEnvelope) AddAudioPlayerClearQueueDirective(clearBehavior string) *ResponseEnvelope {
-	return envelope.AddDirective(&alexa.AudioPlayerDirective{
+	return envelope.AddDirective(&alexa.AudioPlayerClearQueueDirective{
 		Type:          "AudioPlayer.ClearQueue",
 		ClearBehavior: clearBehavior,
 	})
 }
 
 // AddRenderTemplateDirective -
-func (envelope *ResponseEnvelope) AddRenderTemplateDirective(template string) *ResponseEnvelope {
-	return envelope.AddDirective(&alexa.RenderTemplateDirective{
+func (envelope *ResponseEnvelope) AddRenderTemplateDirective(template alexa.DisplayTemplate) *ResponseEnvelope {
+	return envelope.AddDirective(&alexa.DisplayRenderTemplateDirective{
 		Type:     "Display.RenderTemplate",
 		Template: template,
 	})

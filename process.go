@@ -15,7 +15,7 @@ import (
 type RequestEnvelope = alexa.RequestEnvelope
 
 // Request is really alexa.Request
-type Request = alexa.Request
+type Request = alexa.IntentRequest
 
 var timestampTolerance = 150
 
@@ -188,7 +188,8 @@ func (skill *Skill) verifyApplicationID(envelope RequestEnvelope) error {
 // verifyTimestamp compares the request timestamp to the current timestamp
 // and returns an error if they are too far apart.
 func (skill *Skill) verifyTimestamp(envelope RequestEnvelope) error {
-	timestamp, err := time.Parse(time.RFC3339, envelope.Request.Timestamp)
+	request := envelope.Request.(alexa.CommonRequest)
+	timestamp, err := time.Parse(time.RFC3339, request.Timestamp)
 	if err != nil {
 		return errors.New("Unable to parse request timestamp.  Err: " + err.Error())
 	}
@@ -224,7 +225,9 @@ func (handler *DefaultHandler) GetRequestEnvelope() RequestEnvelope {
 
 // GetRequest -- quickly get to the request structure
 func (handler *DefaultHandler) GetRequest() *Request {
-	return handler.envelope.Request
+	request := handler.envelope.Request.(Request)
+
+	return &request
 }
 
 // GetResponse -- Get the response structure
