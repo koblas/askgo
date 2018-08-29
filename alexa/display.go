@@ -18,13 +18,20 @@ type DisplayTemplate struct {
 	BackButton      string             `json:"backButton,omitempty"`
 	BackgroundImage DisplayImageObject `json:"backgroundImage,omitempty"`
 	Title           string             `json:"title,omitempty"`
-	TextContent     struct {
-		PrimaryText   DisplayTextContent `json:"primaryText,omitempty"`
-		SecondaryText DisplayTextContent `json:"secondaryText,omitempty"`
-		TertiaryText  DisplayTextContent `json:"tertiaryText,omitempty"`
-	} `json:"textContent,omitempty"`
+	TextContent     TextContent        `json:"textContent,omitempty"`
 	// ListItems contains the text and images of the list items.
-	ListItems []struct{} `json:"listItems,omitempty"`
+	ListItems []DisplayListItem `json:"listItems,omitempty"`
+}
+
+type TextContent struct {
+	PrimaryText   DisplayTextContent `json:"primaryText,omitempty"`
+	SecondaryText DisplayTextContent `json:"secondaryText,omitempty"`
+	TertiaryText  DisplayTextContent `json:"tertiaryText,omitempty"`
+}
+
+type DisplayListItem struct {
+	Token string      `json:"token"`
+	Title TextContent `json:"textContent,omitempty"`
 }
 
 // DisplayTextContent contains text and a text type for displaying text with the Display interface.
@@ -46,4 +53,19 @@ type DisplayImageSource struct {
 	Size         string `json:"size,omitempty"`
 	WidthPixels  int    `json:"widthPixels,omitempty"`
 	HeightPixels int    `json:"heightPixels,omitempty"`
+}
+
+// AddImageSource adds source information for a image with the given size.
+func (i *DisplayImageObject) AddImageSource(size, url string, heightPixels, widthPixels int) *DisplayImageSource {
+	if i.Sources == nil {
+		i.Sources = make([]*DisplayImageSource, 0)
+	}
+	displayImageSource := &DisplayImageSource{
+		Size:         size,
+		URL:          url,
+		HeightPixels: heightPixels,
+		WidthPixels:  widthPixels,
+	}
+	i.Sources = append(i.Sources, displayImageSource)
+	return displayImageSource
 }
