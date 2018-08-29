@@ -5,8 +5,8 @@ type RequestEnvelope struct {
 	Version string  `json:"version"`
 	Session Session `json:"session"`
 	// one of the request structs
-	Request interface{} `json:"request"`
-	Context Context     `json:"context"`
+	Request Request `json:"request"`
+	Context Context `json:"context"`
 }
 
 // Session object contained in standard request types like LaunchRequest, IntentRequest, SessionEndedRequest and GameEngine interface.
@@ -57,33 +57,42 @@ type AudioPlayer struct {
 	PlayerActivity       string `json:"playerActivity"`
 }
 
-// requestEnvelopeDataProvider provides a way to set Context and Session metadata for common requests.
-type requestEnvelopeDataProvider interface {
-	setContext(ctx *Context)
-	setSession(session *Session)
-}
-
-// CommonRequest contains the attributes all alexa requests have in common.
-type CommonRequest struct {
+// Request contains the attributes all alexa requests have in common.
+type Request struct {
 	Type      string `json:"type"`
 	RequestID string `json:"requestId"`
 	Timestamp string `json:"timestamp"`
 	Locale    string `json:"locale"`
 	// Set manually from request envelope
-	Session *Session
-	Context *Context
-}
-
-// LaunchRequest send by Alexa if a skill is started.
-type LaunchRequest struct {
-	CommonRequest
-}
-
-// IntentRequest is send if a intent is invoked.
-type IntentRequest struct {
-	CommonRequest
+	Session *Session `json:"session,omitempty"`
+	Context *Context `json:"context,omitempty"`
+	// Intent Requests
 	Intent      Intent `json:"intent,omitempty"`
 	DialogState string `json:"dialogState,omitempty"`
+	// SessionEndRequest
+	Reason string `json:"reason,omitempty"`
+	// SessionEndRequest, SystemExceptionEncounteredRequest
+	Error struct {
+		Type    string `json:"type"`
+		Message string `json:"message"`
+	} `json:"error,omitempty"`
+	// SystemExceptionEncounteredRequest
+	Cause struct {
+		RequestID string `json:"requestId"`
+	} `json:"cause"`
+
+	// AudioPlayerRequest represents an incoming request from the Audioplayer Interface.
+	// It does not have a session context.  Response to such a request must be a
+	// AudioPlayerDirective or empty
+	Token                string `json:"token"`
+	OffsetInMilliseconds int    `json:"offsetInMilliseconds"`
+
+	// AudioPlayerPlaybackFailedRequest is sent when Alexa encounters an error when attempting to play a stream.
+	CurrentPlaybackState struct {
+		Token                string `json:"token"`
+		OffsetInMilliseconds int    `json:"offsetInMilliseconds"`
+		PlayerActivity       string `json:"playerActivity"`
+	} `json:"currentPlaybackState"`
 }
 
 // Intent provided in Intent requests
@@ -99,26 +108,4 @@ type IntentSlot struct {
 	Value              string      `json:"value"`
 	ConfirmationStatus string      `json:"confirmationStatus,omitempty"`
 	Resolutions        interface{} `json:"resolutions"`
-}
-
-// SessionEndedRequest if a skill is stopped or cancelled.
-type SessionEndedRequest struct {
-	CommonRequest
-	Reason string `json:"reason,omitempty"`
-	Error  struct {
-		Type    string `json:"type"`
-		Message string `json:"message"`
-	} `json:"error,omitempty"`
-}
-
-// SystemExceptionEncounteredRequest is send ff a GameEngine directive that you send fails, then your skill will be invoked with a standard System.ExceptionEncountered request. Any directives included in the response are ignored.
-type SystemExceptionEncounteredRequest struct {
-	CommonRequest
-	Error struct {
-		Type    string `json:"type"`
-		Message string `json:"message"`
-	} `json:"error"`
-	Cause struct {
-		RequestID string `json:"requestId"`
-	} `json:"cause"`
 }
