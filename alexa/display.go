@@ -30,8 +30,8 @@ type TextContent struct {
 }
 
 type DisplayListItem struct {
-	Token string      `json:"token"`
-	Title TextContent `json:"textContent,omitempty"`
+	Token       string      `json:"token"`
+	TextContent TextContent `json:"textContent,omitempty"`
 }
 
 // DisplayTextContent contains text and a text type for displaying text with the Display interface.

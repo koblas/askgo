@@ -56,7 +56,7 @@ type HandlerInput interface {
 	GetRequestEnvelope() RequestEnvelope
 
 	// GetRequest is a shortcut to GetRequestEnvelope().Request
-	GetRequest() *Request
+	GetRequest() Request
 
 	// Get the response structure
 	GetResponse() *ResponseEnvelope
@@ -224,10 +224,8 @@ func (handler *DefaultHandler) GetRequestEnvelope() RequestEnvelope {
 }
 
 // GetRequest -- quickly get to the request structure
-func (handler *DefaultHandler) GetRequest() *Request {
-	request := handler.envelope.Request.(Request)
-
-	return &request
+func (handler *DefaultHandler) GetRequest() Request {
+	return handler.envelope.Request.(Request)
 }
 
 // GetResponse -- Get the response structure

@@ -11,6 +11,11 @@ import (
 	"github.com/koblas/askgo/alexa"
 )
 
+func supportsDisplay(ctx alexa.Context) bool {
+	_, found := ctx.System.Device.SupportedInterfaces["display"]
+	return found
+}
+
 //  -----------------------
 var attributeContext struct{}
 
@@ -155,7 +160,7 @@ func (h *quizHandler) CanHandle(input askgo.HandlerInput) bool {
 }
 func (h *quizHandler) Handle(input askgo.HandlerInput) (*askgo.ResponseEnvelope, error) {
 	request := input.GetRequest()
-	builder := input.GetResponse().WithShouldEndSession(false)
+	response := input.GetResponse().WithShouldEndSession(false)
 	attributes := input.GetContext().Value(&attributeContext).(*Attributes)
 
 	log.Printf("QuizHandler requestId=%s, sessionId=%s", request.RequestID, attributes.SessionID)
@@ -165,14 +170,48 @@ func (h *quizHandler) Handle(input askgo.HandlerInput) (*askgo.ResponseEnvelope,
 	askQuestion(request, attributes)
 	question := getQuestion(attributes)
 
-	return builder.Speak(fmt.Sprintf("%s %s", startQuizMessage, question)).Reprompt(question), nil
+	if supportsDisplay(input.GetRequestEnvelope().Context) {
+		title := fmt.Sprintf("Question #", attributes.Counter)
 
-	/*
-		if supportsDisplay(acontext) {
-			// response.SetSimpleCard(fmt.Sprintf("Question #$d", session.Attributes.String["counter"]), "")
-			// * TODO * more interesting display
+		image := &alexa.DisplayImageObject{}
+
+		image.AddImageSource(
+			"large",
+			getBackgroundImage(getQuizItem(attributes).Abbreviation),
+			1024,
+			600,
+		)
+
+		itemList := make([]alexa.DisplayListItem, 0)
+		for i, answer := range getMultipleChoiceAnswers(attributes) {
+			itemList = append(itemList, alexa.DisplayListItem{
+				Token: fmt.Sprintf("%d", i),
+				TextContent: alexa.TextContent{
+					PrimaryText: alexa.DisplayTextContent{
+						Type: "RichText",
+						Text: answer,
+					},
+				},
+			})
 		}
-	*/
+
+		response.AddRenderTemplateDirective(alexa.DisplayTemplate{
+			Type:            "ListTemplate1",
+			Token:           "Question",
+			BackButton:      "hidden",
+			Title:           title,
+			BackgroundImage: *image,
+			TextContent: alexa.TextContent{
+				PrimaryText: alexa.DisplayTextContent{
+					Type: "RichText",
+					Text: getQuestionWithoutOrdinal(attributes),
+				},
+			},
+			ListItems: itemList,
+		})
+	}
+
+	return response.Speak(fmt.Sprintf("%s %s", startQuizMessage, question)).Reprompt(question), nil
 }
 
 //  -----------------------
@@ -238,7 +277,21 @@ func (h *definitionHandler) Handle(input askgo.HandlerInput) (*askgo.ResponseEnv
 	if match != nil {
 		msg := getSpeechDescription(*match)
 
-		// @TODO -- msg is <speak>tag...
+		/*
+			if supportsDisplay(request.Context) {
+				const image = new Alexa.ImageHelper().addImageInstance(getLargeImage(item)).getImage();
+				const title = getCardTitle(item);
+				const primaryText = new Alexa.RichTextContentHelper().withPrimaryText(getTextDescription(item, "<br/>")).getTextContent();
+				response.addRenderTemplateDirective({
+					type: 'BodyTemplate2',
+					backButton: 'visible',
+					image,
+					title,
+					textContent: primaryText,
+				});
+			}
+		*/
+
 		response.Speak(msg).Reprompt(msg)
 	} else {
 		msg := fmt.Sprintf("I'm sorry. %s is not something I know very much about in this skill. %s", formatCasing(slotItem), helpMessage)
@@ -293,9 +346,47 @@ func (h *quizAnswerHandler) Handle(input askgo.HandlerInput) (*askgo.ResponseEnv
 
 		output = append(output, question)
 		response.Reprompt(question)
+
+		/*
+			if (supportsDisplay(handlerInput)) {
+				const title = `Question #${attributes.counter}`;
+				const primaryText = new Alexa.RichTextContentHelper().withPrimaryText(getQuestionWithoutOrdinal(attributes.quizProperty, attributes.quizItem)).getTextContent();
+				const backgroundImage = new Alexa.ImageHelper().addImageInstance(getBackgroundImage(attributes.quizItem.Abbreviation)).getImage();
+				const itemList = [];
+				getAndShuffleMultipleChoiceAnswers(attributes.selectedItemIndex, attributes.quizItem, attributes.quizProperty).forEach((x, i) => {
+					itemList.push(
+						{
+							"token" : x,
+							"textContent" : new Alexa.PlainTextContentHelper().withPrimaryText(x).getTextContent(),
+						}
+					);
+				});
+				response.addRenderTemplateDirective({
+					type : 'ListTemplate1',
+					token : 'Question',
+					backButton : 'hidden',
+					backgroundImage,
+					title,
+					listItems : itemList,
+				});
+			}
+		*/
 	} else {
 		output = append(output, getFinalScore(attributes))
 		output = append(output, exitSkillMessage)
+
+		/*
+			if(supportsDisplay(handlerInput)) {
+				const title = 'Thank you for playing';
+				const primaryText = new Alexa.RichTextContentHelper().withPrimaryText(getFinalScore(attributes.quizScore, attributes.counter)).getTextContent();
+				response.addRenderTemplateDirective({
+					type : 'BodyTemplate1',
+					backButton: 'hidden',
+					title,
+					textContent: primaryText,
+				});
+			}
+		*/
 
 		attributes.State = START
 	}

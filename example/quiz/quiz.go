@@ -5,6 +5,7 @@ import (
 	"log"
 	"math/rand"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/fatih/structs"
@@ -40,6 +41,8 @@ type Attributes struct {
 ///
 var (
 	random = rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	backgroundImagePath = "https://m.media-amazon.com/images/G/01/mobile-apps/dex/alexa/alexa-skills-kit/tutorials/quiz-game/state_flag/{0}x{1}/{2}._TTH_.png"
 
 	welcomeMessage = `Welcome to the United States Quiz Game!
 											You can ask me about any of the fifty states and their capitals, 
@@ -171,7 +174,7 @@ var data = []QuizItem{
 
 ///
 
-func askQuestion(request *askgo.Request, attributes *Attributes) {
+func askQuestion(request askgo.Request, attributes *Attributes) {
 	itemIndex := random.Intn(len(data))
 
 	item := data[itemIndex]
@@ -204,10 +207,13 @@ func formatCasing(name string) string {
 }
 
 func getQuestion(attributes *Attributes) string {
+	return fmt.Sprintf("Here is your %dth question.  %s", attributes.Counter, getQuestionWithoutOrdinal(attributes))
+}
+
+func getQuestionWithoutOrdinal(attributes *Attributes) string {
 	title := formatCasing(attributes.QuizProperty)
 	item := data[attributes.QuizItemIndex]
-
-	return fmt.Sprintf("Here is your %dth question.  What is the %s of %s?", attributes.Counter, title, item.StateName)
+	return fmt.Sprintf("What is the %s of %s?", title, item.StateName)
 }
 
 func getAnswer(attributes *Attributes) string {
@@ -262,4 +268,49 @@ func getAttributes(input askgo.HandlerInput) *Attributes {
 	// attributes.UserID = session.UserID
 
 	return attributes
+}
+
+// This function randomly chooses 3 answers 2 incorrect and 1 correct answer to
+// display on the screen using the ListTemplate. It ensures that the list is unique.
+func getMultipleChoiceAnswers(attributes *Attributes) []string {
+	src := []string{attributes.QuizAnswer}
+
+	for len(src) != 3 {
+		itemIndex := random.Intn(len(data))
+
+		item := data[itemIndex]
+
+		s := structs.New(&item)
+
+		value := fmt.Sprintf("%v", s.Field(attributes.QuizProperty).Value())
+
+		if value != src[0] && (len(src) == 1 || value != src[1]) {
+			src = append(src, value)
+		}
+	}
+
+	// Now just shuffle it
+	dest := make([]string, len(src))
+	for i, v := range rand.Perm(len(src)) {
+		dest[v] = src[i]
+	}
+
+	return dest
+}
+
+func getBackgroundImage(label string) string {
+	height := "1024"
+	width := "600"
+
+	r := strings.NewReplacer(
+		"{0}", height,
+		"{1}", width,
+		"{2}", label,
+	)
+
+	return r.Replace(backgroundImagePath)
+}
+
+func getQuizItem(attributes *Attributes) QuizItem {
+	return data[attributes.QuizItemIndex]
 }

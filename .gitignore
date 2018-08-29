@@ -13,3 +13,8 @@
 
 main
 main.zip
+
+#
+.env
+*.swp
+.DS_Store
