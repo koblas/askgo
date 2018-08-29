@@ -37,8 +37,8 @@ type DisplayListItem struct {
 // DisplayTextContent contains text and a text type for displaying text with the Display interface.
 type DisplayTextContent struct {
 	//Type must be PlainText or RichtText
-	Type string `json:"type"`
-	Text string `json:"text"`
+	Type string `json:"type,omitempty"`
+	Text string `json:"text,omitempty"`
 }
 
 // DisplayImageObject references and describes the image. Multiple sources for the image can be provided.
