@@ -18,15 +18,15 @@ type DisplayTemplate struct {
 	BackButton      string             `json:"backButton,omitempty"`
 	BackgroundImage DisplayImageObject `json:"backgroundImage,omitempty"`
 	Title           string             `json:"title,omitempty"`
-	TextContent     TextContent        `json:"textContent,omitempty"`
+	TextContent     *TextContent       `json:"textContent,omitempty"`
 	// ListItems contains the text and images of the list items.
 	ListItems []DisplayListItem `json:"listItems,omitempty"`
 }
 
 type TextContent struct {
-	PrimaryText   DisplayTextContent `json:"primaryText,omitempty"`
-	SecondaryText DisplayTextContent `json:"secondaryText,omitempty"`
-	TertiaryText  DisplayTextContent `json:"tertiaryText,omitempty"`
+	PrimaryText   DisplayTextContent  `json:"primaryText,omitempty"`
+	SecondaryText *DisplayTextContent `json:"secondaryText,omitempty"`
+	TertiaryText  *DisplayTextContent `json:"tertiaryText,omitempty"`
 }
 
 type DisplayListItem struct {
@@ -43,7 +43,7 @@ type DisplayTextContent struct {
 
 // DisplayImageObject references and describes the image. Multiple sources for the image can be provided.
 type DisplayImageObject struct {
-	ContentDescription string                `json:"contentDescription"`
+	ContentDescription string                `json:"contentDescription,omitempty"`
 	Sources            []*DisplayImageSource `json:"sources"`
 }
 
@@ -51,8 +51,8 @@ type DisplayImageObject struct {
 type DisplayImageSource struct {
 	URL          string `json:"url"`
 	Size         string `json:"size,omitempty"`
-	WidthPixels  int    `json:"widthPixels,omitempty"`
-	HeightPixels int    `json:"heightPixels,omitempty"`
+	WidthPixels  int    `json:"widthPixels"`
+	HeightPixels int    `json:"heightPixels"`
 }
 
 // AddImageSource adds source information for a image with the given size.
