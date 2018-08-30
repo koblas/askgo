@@ -27,8 +27,8 @@ const (
 
 // Attributes for the current user session
 type Attributes struct {
-	SessionID string `mapstructure:"-"`
-	UserID    string `mapstructure:"-"`
+	sessionID string
+	userID    string
 
 	State         States
 	Counter       int
@@ -264,7 +264,7 @@ func getAttributes(input askgo.HandlerInput) *Attributes {
 		log.Printf("Attributes = DEFAULT")
 	}
 
-	attributes.SessionID = session.SessionID
+	attributes.sessionID = session.SessionID
 	// attributes.UserID = session.UserID
 
 	return attributes

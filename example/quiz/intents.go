@@ -12,7 +12,7 @@ import (
 )
 
 func supportsDisplay(ctx alexa.Context) bool {
-	_, found := ctx.System.Device.SupportedInterfaces["display"]
+	_, found := ctx.System.Device.SupportedInterfaces["Display"]
 	return found
 }
 
@@ -59,7 +59,7 @@ func (h *errorHandler) Handle(input askgo.HandlerInput) (*askgo.ResponseEnvelope
 	builder := input.GetResponse().WithShouldEndSession(false)
 	attributes := input.GetContext().Value(&attributeContext).(*Attributes)
 
-	log.Printf("ErrorHandler requestId=%s, sessionId=%s", request.RequestID, attributes.SessionID)
+	log.Printf("ErrorHandler requestId=%s, sessionId=%s", request.RequestID, attributes.sessionID)
 
 	return builder.Speak(helpMessage).Reprompt(helpMessage), nil
 }
@@ -76,7 +76,7 @@ func (h *helpHandler) Handle(input askgo.HandlerInput) (*askgo.ResponseEnvelope,
 	builder := input.GetResponse().WithShouldEndSession(false)
 	attributes := input.GetContext().Value(&attributeContext).(*Attributes)
 
-	log.Printf("HelpHandler requestId=%s, sessionId=%s", request.RequestID, attributes.SessionID)
+	log.Printf("HelpHandler requestId=%s, sessionId=%s", request.RequestID, attributes.sessionID)
 
 	return builder.Speak(helpMessage).Reprompt(helpMessage), nil
 }
@@ -95,7 +95,7 @@ func (h *exitHandler) Handle(input askgo.HandlerInput) (*askgo.ResponseEnvelope,
 	builder := input.GetResponse().WithShouldEndSession(true)
 	attributes := input.GetContext().Value(&attributeContext).(*Attributes)
 
-	log.Printf("ExitHandler requestId=%s, sessionId=%s", request.RequestID, attributes.SessionID)
+	log.Printf("ExitHandler requestId=%s, sessionId=%s", request.RequestID, attributes.sessionID)
 
 	return builder.Speak(exitSkillMessage), nil
 }
@@ -110,7 +110,7 @@ func (h *sessionEndHandler) Handle(input askgo.HandlerInput) (*askgo.ResponseEnv
 	request := input.GetRequest()
 	attributes := input.GetContext().Value(&attributeContext).(*Attributes)
 
-	log.Printf("SessionEnd requestId=%s, sessionId=%s", request.RequestID, attributes.SessionID)
+	log.Printf("SessionEnd requestId=%s, sessionId=%s", request.RequestID, attributes.sessionID)
 
 	return input.GetResponse().WithShouldEndSession(true), nil
 }
@@ -126,7 +126,7 @@ func (h *launchHandler) Handle(input askgo.HandlerInput) (*askgo.ResponseEnvelop
 	response := input.GetResponse().WithShouldEndSession(false)
 	attributes := input.GetContext().Value(&attributeContext).(*Attributes)
 
-	log.Printf("LaunchRequest requestId=%s, sessionId=%s", request.RequestID, attributes.SessionID)
+	log.Printf("LaunchRequest requestId=%s, sessionId=%s", request.RequestID, attributes.sessionID)
 
 	return response.Speak(welcomeMessage).Reprompt(helpMessage), nil
 }
@@ -143,7 +143,7 @@ func (h *repeatHandler) Handle(input askgo.HandlerInput) (*askgo.ResponseEnvelop
 	builder := input.GetResponse().WithShouldEndSession(false)
 	attributes := input.GetContext().Value(&attributeContext).(*Attributes)
 
-	log.Printf("RepeatHandler requestId=%s, sessionId=%s", request.RequestID, attributes.SessionID)
+	log.Printf("RepeatHandler requestId=%s, sessionId=%s", request.RequestID, attributes.sessionID)
 
 	question := getQuestion(attributes)
 
@@ -163,7 +163,7 @@ func (h *quizHandler) Handle(input askgo.HandlerInput) (*askgo.ResponseEnvelope,
 	response := input.GetResponse().WithShouldEndSession(false)
 	attributes := input.GetContext().Value(&attributeContext).(*Attributes)
 
-	log.Printf("QuizHandler requestId=%s, sessionId=%s", request.RequestID, attributes.SessionID)
+	log.Printf("QuizHandler requestId=%s, sessionId=%s", request.RequestID, attributes.sessionID)
 
 	attributes.State = QUIZ
 	attributes.Counter = 0
@@ -171,24 +171,19 @@ func (h *quizHandler) Handle(input askgo.HandlerInput) (*askgo.ResponseEnvelope,
 	question := getQuestion(attributes)
 
 	if supportsDisplay(input.GetRequestEnvelope().Context) {
-		title := fmt.Sprintf("Question #", attributes.Counter)
+		title := fmt.Sprintf("Question #%v", attributes.Counter)
 
 		image := &alexa.DisplayImageObject{}
 
-		image.AddImageSource(
-			"large",
-			getBackgroundImage(getQuizItem(attributes).Abbreviation),
-			1024,
-			600,
-		)
+		image.AddImageSource("", getBackgroundImage(getQuizItem(attributes).Abbreviation), 0, 0)
 
 		itemList := make([]alexa.DisplayListItem, 0)
 		for i, answer := range getMultipleChoiceAnswers(attributes) {
 			itemList = append(itemList, alexa.DisplayListItem{
-				Token: fmt.Sprintf("%d", i),
+				Token: fmt.Sprintf("item_%d", i+1),
 				TextContent: alexa.TextContent{
 					PrimaryText: alexa.DisplayTextContent{
-						Type: "RichText",
+						Type: "PlainText",
 						Text: answer,
 					},
 				},
@@ -196,17 +191,19 @@ func (h *quizHandler) Handle(input askgo.HandlerInput) (*askgo.ResponseEnvelope,
 		}
 
 		response.AddRenderTemplateDirective(alexa.DisplayTemplate{
-			Type:            "ListTemplate1",
-			Token:           "Question",
-			BackButton:      "hidden",
+			Type:  "ListTemplate1",
+			Token: "QUESTION",
+			// BackButton:      "HIDDEN",
 			Title:           title,
 			BackgroundImage: *image,
-			TextContent: alexa.TextContent{
-				PrimaryText: alexa.DisplayTextContent{
-					Type: "RichText",
-					Text: getQuestionWithoutOrdinal(attributes),
+			/*
+				TextContent: alexa.TextContent{
+					PrimaryText: alexa.DisplayTextContent{
+						Type: "RichText",
+						Text: getQuestionWithoutOrdinal(attributes),
+					},
 				},
-			},
+			*/
 			ListItems: itemList,
 		})
 	}
@@ -229,7 +226,7 @@ func (h *definitionHandler) Handle(input askgo.HandlerInput) (*askgo.ResponseEnv
 	response := input.GetResponse().WithShouldEndSession(false)
 	attributes := input.GetContext().Value(&attributeContext).(*Attributes)
 
-	log.Printf("DefinitionHandler requestId=%s, sessionId=%s", request.RequestID, attributes.SessionID)
+	log.Printf("DefinitionHandler requestId=%s, sessionId=%s", request.RequestID, attributes.sessionID)
 
 	overlap := make(map[string]int)
 
@@ -316,7 +313,7 @@ func (h *quizAnswerHandler) Handle(input askgo.HandlerInput) (*askgo.ResponseEnv
 	response := input.GetResponse().WithShouldEndSession(false)
 	attributes := input.GetContext().Value(&attributeContext).(*Attributes)
 
-	log.Printf("QuizAnswerHandler requestId=%s, sessionId=%s", request.RequestID, attributes.SessionID)
+	log.Printf("QuizAnswerHandler requestId=%s, sessionId=%s", request.RequestID, attributes.sessionID)
 
 	var isCorrect bool
 
